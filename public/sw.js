@@ -1,10 +1,16 @@
 self.addEventListener('push', function(event) {
-    const data = event.data.json();
+    let data;
+    try {
+        data = event.data.json();
+    } catch (error) {
+        console.error('Error parsing push data:', error);
+        return;
+    }
     const options = {
         body: data.body,
-        icon: '/icon-192x192.png',
-        badge: '/icon-192x192.png',
-        data: { url: data.url }
+        icon: data.icon || '/icon-192x192.png',
+        badge: data.badge || '/icon-192x192.png',
+        data: { url: data.url || '/' }
     };
     event.waitUntil(self.registration.showNotification(data.title, options));
 });
