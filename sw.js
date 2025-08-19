@@ -1,11 +1,10 @@
-// sw.js
 self.addEventListener('push', function(event) {
     const data = event.data.json();
     const options = {
         body: data.body,
-        icon: '/icon-192x192.png', // Icon for notification
-        badge: '/icon-192x192.png', // Badge for Android
-        data: { url: data.url } // URL to open when clicked
+        icon: '/icon-192x192.png',
+        badge: '/icon-192x192.png',
+        data: { url: data.url }
     };
     event.waitUntil(self.registration.showNotification(data.title, options));
 });
