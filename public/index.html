@@ -2,219 +2,227 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" href="/icon-192x192.png">
     <title>Nepali Date and Calendar</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
          :root {
-            --primary-color: #2e7d32;
-            --secondary-color: #4caf50;
-            --accent-color: #8bc34a;
-            --text-color: #333;
-            --text-color1: #000000;
-            --light-bg: #f9f9f9;
-            --header-bg: #2e7d32;
-            --today-highlight: #ffeb3b;
-            --bs-color: #f28c38;
-            --default-mode: ad;
+            --primary-color: #1a5f3a;
+            --secondary-color: #388e3c;
+            --accent-color: #81c784;
+            --text-color: #212121;
+            --bg-color: #fafafa;
+            --card-bg: #ffffff;
+            --highlight-color: #ffee58;
+            --bs-color: #e65100;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Poppins", sans-serif;
+            font-family: "Roboto", sans-serif;
         }
         
         body {
-            background-color: var(--light-bg);
+            background-color: var(--bg-color);
             color: var(--text-color);
-            line-height: 1.6;
-            font-size: clamp(14px, 2.5vw, 16px);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: clamp(14px, 3.5vw, 16px);
+            line-height: 1.5;
         }
         
         .container {
-            max-width: 90%;
+            max-width: 100%;
+            width: min(90%, 1200px);
             margin: 0 auto;
-            padding: 1rem;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            flex: 1;
         }
         
         header {
-            text-align: center;
-            background-color: var(--header-bg);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: clamp(1rem, 3vw, 1.5rem);
-            border-radius: 0.625rem;
-            margin-bottom: 1.25rem;
+            text-align: center;
+            padding: clamp(1.5rem, 4vw, 2rem);
+            border-radius: 0 0 clamp(0.5rem, 1vw, 0.75rem) clamp(0.5rem, 1vw, 0.75rem);
+            margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
         }
         
         header h1 {
-            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-size: clamp(1.6rem, 5vw, 2.2rem);
+            font-family: "Noto Sans Devanagari", sans-serif;
+            font-weight: 700;
         }
         
         header h2 {
-            font-size: clamp(0.9rem, 3vw, 1.2rem);
+            font-size: clamp(0.9rem, 2.8vw, 1.1rem);
             font-weight: 400;
+            opacity: 0.9;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(0.5rem, 1.5vw, 0.75rem);
+            justify-content: center;
+            margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
+        }
+        
+        .action-buttons button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.25rem);
+            border-radius: 0.5rem;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            cursor: pointer;
+            min-height: 48px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        
+        .action-buttons button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
         }
         
         .current-date {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1.25rem;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: clamp(0.75rem, 2vw, 1rem);
+            margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
         }
         
         .date-box {
-            background-color: white;
-            border: 2px solid var(--primary-color);
-            border-radius: 0.625rem;
-            padding: clamp(0.8rem, 2vw, 1.2rem);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: clamp(0.75rem, 2vw, 1rem);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
-            flex: 1;
-            min-width: min(150px, 40vw);
-            max-width: 250px;
-            transition: transform 0.2s;
+            transition: transform 0.2s ease;
         }
         
         .date-box:hover {
-            transform: scale(1.02);
+            transform: translateY(-4px);
         }
         
-        .label {
-            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+        .date-box .label {
+            font-size: clamp(0.8rem, 2.2vw, 0.9rem);
             color: var(--secondary-color);
-            margin-bottom: 0.3rem;
             font-weight: 500;
+            margin-bottom: 0.25rem;
         }
         
-        .date-value {
-            font-size: clamp(1rem, 3.5vw, 1.5rem);
-            font-weight: 600;
+        .date-box .date-value {
+            font-size: clamp(1rem, 3vw, 1.2rem);
             font-family: "Noto Sans Devanagari", sans-serif;
+            font-weight: 600;
+        }
+        
+        .calendar-container {
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: clamp(0.75rem, 2vw, 1rem);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
         }
         
         .calendar-header {
-            background-color: white;
-            border-radius: 0.625rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            padding: 1rem;
-            margin-bottom: 1.25rem;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.5rem;
             flex-wrap: wrap;
+            align-items: center;
+            gap: clamp(0.5rem, 1.5vw, 0.75rem);
+            margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem);
+            justify-content: space-between;
         }
         
         .calendar-header h3 {
-            font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            font-family: "Noto Sans Devanagari", sans-serif;
+            font-weight: 500;
             color: var(--primary-color);
-            font-weight: 600;
-            font-family: "Noto Sans Devanagari", sans-serif;
-            flex: 1;
             text-align: center;
-            min-width: 100%;
+            flex: 1;
         }
         
-        .calendar-header .bs-year {
-            font-size: 0.8rem;
-            color: var(--bs-color);
-            margin-left: 0.3rem;
-            font-family: "Noto Sans Devanagari", sans-serif;
-        }
-        
-        .calendar-header .nav-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .calendar-header button {
+        .calendar-header .nav-buttons button {
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 0.3125rem;
-            padding: 0.6rem 0.9rem;
+            padding: clamp(0.5rem, 1.5vw, 0.75rem);
+            border-radius: 0.5rem;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
             cursor: pointer;
-            font-size: 0.9rem;
-            min-width: 44px;
-            min-height: 44px;
-            transition: background-color 0.3s, transform 0.1s;
+            min-height: 48px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
         
-        .calendar-header button:hover {
+        .calendar-header .nav-buttons button:hover {
             background-color: var(--secondary-color);
-            transform: scale(1.05);
+            transform: translateY(-2px);
         }
         
         .calendar-header .selectors {
             display: flex;
-            gap: 0.5rem;
-            align-items: center;
             flex-wrap: wrap;
-            width: 100%;
+            gap: clamp(0.5rem, 1.5vw, 0.75rem);
+            flex: 2;
             justify-content: center;
         }
         
-        .calendar-header select {
-            padding: 0.5rem;
-            border-radius: 0.3125rem;
-            border: 1px solid #ddd;
-            font-size: 0.9rem;
+        .calendar-header select,
+        .calendar-header button {
+            padding: clamp(0.5rem, 1.5vw, 0.75rem);
+            border-radius: 0.5rem;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            min-height: 48px;
+            border: 1px solid #e0e0e0;
             background-color: white;
             cursor: pointer;
             font-family: "Noto Sans Devanagari", sans-serif;
-            min-width: 100px;
-            flex: 1;
         }
         
-        .calendar-header select:focus {
+        .calendar-header select:focus,
+        .calendar-header button:focus {
             outline: none;
-            border-color: var(--primary-color);
-        }
-        
-        .calendar-header #view-calendar,
-        .calendar-header #toggle-mode {
-            padding: 0.6rem 0.9rem;
-            font-weight: 600;
+            border-color: var(--secondary-color);
         }
         
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(7, minmax(0, 1fr));
-            gap: 0.3rem;
-            background-color: #f0f0f0;
-            padding: 0.6rem;
-            border-radius: 0.3125rem;
+            grid-template-columns: repeat(7, 1fr);
+            gap: clamp(0.25rem, 0.8vw, 0.5rem);
+            background-color: #f5f5f5;
+            padding: clamp(0.5rem, 1.5vw, 0.75rem);
+            border-radius: 0.5rem;
         }
         
         .calendar-day-header {
             text-align: center;
-            font-weight: 600;
-            padding: 0.6rem;
+            font-weight: 500;
+            padding: clamp(0.5rem, 1.5vw, 0.75rem);
             color: var(--primary-color);
             font-family: "Noto Sans Devanagari", sans-serif;
-            font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+            font-size: clamp(0.8rem, 2.2vw, 0.9rem);
         }
         
         .calendar-day {
-            background-color: white;
+            background-color: var(--card-bg);
             text-align: center;
-            padding: 0.4rem;
-            border-radius: 0.3125rem;
+            padding: clamp(0.4rem, 1.2vw, 0.6rem);
+            border-radius: 0.5rem;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: clamp(40px, 10vw, 70px);
-            aspect-ratio: 1/1;
-            position: relative;
+            min-height: clamp(70px, 16vw, 80px);
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
         
         .calendar-day:hover {
@@ -222,271 +230,190 @@
             color: white;
         }
         
-         :root:not([data-mode="bs"]) .calendar-day .ad-date {
-            font-size: clamp(0.8rem, 2.5vw, 1.1rem);
-            font-weight: 600;
-            color: var(--primary-color);
+        .calendar-day .ad-date,
+        .calendar-day .bs-date {
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            font-weight: 500;
+            line-height: 1.2;
         }
         
-         :root:not([data-mode="bs"]) .calendar-day .bs-date {
-            font-size: clamp(0.6rem, 2vw, 0.7rem);
+         :root[data-mode="default"] .calendar-day .ad-date {
+            font-size: clamp(0.65rem, 1.8vw, 0.75rem);
+            color: var(--primary-color);
+            /* Dark green for AD dates */
+        }
+        
+         :root[data-mode="default"] .calendar-day .bs-date {
+            font-size: clamp(0.65rem, 1.8vw, 0.75rem);
             color: var(--bs-color);
+            /* Orange for BS dates */
+        }
+        
+         :root[data-mode="bs"] .calendar-day .bs-date {
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            font-weight: 600;
+            color: var(--primary-color);
             font-family: "Noto Sans Devanagari", sans-serif;
         }
         
          :root[data-mode="bs"] .calendar-day .ad-date {
-            font-size: clamp(0.6rem, 2vw, 0.7rem);
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
             color: var(--bs-color);
         }
         
-         :root[data-mode="bs"] .calendar-day .bs-date {
-            font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+         :root[data-mode="ad"] .calendar-day .ad-date {
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
             font-weight: 600;
             color: var(--primary-color);
+        }
+        
+         :root[data-mode="ad"] .calendar-day .bs-date {
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            color: var(--bs-color);
             font-family: "Noto Sans Devanagari", sans-serif;
         }
         
+        .calendar-day .month-display {
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            font-family: "Noto Sans Devanagari", sans-serif;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            width: 100%;
+            line-height: 1.2;
+        }
+        
+         :root[data-mode="default"] .calendar-day .month-display {
+            font-size: clamp(0.65rem, 1.8vw, 0.75rem);
+        }
+        
         .calendar-day:hover .ad-date,
-        .calendar-day:hover .bs-date {
+        .calendar-day:hover .bs-date,
+        .calendar-day:hover .month-display {
             color: white;
         }
         
         .calendar-day.empty {
             background-color: transparent;
             cursor: default;
-            aspect-ratio: 1/1;
+            min-height: clamp(70px, 16vw, 80px);
         }
         
         .calendar-day.today {
-            background-color: var(--today-highlight);
+            background-color: var(--highlight-color);
             font-weight: 600;
         }
         
-        .month-display {
-            display: block;
-            font-size: 0.5em;
-            margin-top: 2px;
-            opacity: 0.7;
-        }
-        
         .converter {
-            background-color: white;
-            border-radius: 0.625rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 1rem;
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: clamp(0.75rem, 2vw, 1rem);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         
         .converter h3 {
-            color: var(--primary-color);
-            margin-bottom: 0.9rem;
-            font-size: clamp(1rem, 3vw, 1.3rem);
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
             font-family: "Noto Sans Devanagari", sans-serif;
+            font-weight: 500;
+            color: var(--primary-color);
+            margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem);
         }
         
         .converter-options {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.6rem;
-            margin-bottom: 0.9rem;
+            gap: clamp(0.5rem, 1.5vw, 0.75rem);
+            margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem);
         }
         
         .converter-options select,
         .converter-options input,
         .converter-options button {
-            padding: 0.6rem;
-            border-radius: 0.3125rem;
-            border: 1px solid #ddd;
-            font-size: 0.9rem;
-            min-height: 44px;
+            padding: clamp(0.5rem, 1.5vw, 0.75rem);
+            border-radius: 0.5rem;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            min-height: 48px;
+            border: 1px solid #e0e0e0;
+            background-color: white;
             flex: 1;
-            min-width: 120px;
-        }
-        
-        .converter-options select {
-            font-family: "Noto Sans Devanagari", sans-serif;
+            min-width: clamp(100px, 25vw, 120px);
         }
         
         .converter-options button {
-            background-color: var(--primary-color);
+            background-color: var(--secondary-color);
             color: white;
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
         
         .converter-options button:hover {
-            background-color: var(--secondary-color);
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
         }
         
         .nepali-inputs {
             display: none;
-            gap: 0.6rem;
             flex-wrap: wrap;
+            gap: clamp(0.5rem, 1.5vw, 0.75rem);
             width: 100%;
         }
         
         #conversion-result {
-            padding: 0.9rem;
-            background-color: #f0f0f0;
-            border-radius: 0.3125rem;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            padding: clamp(0.5rem, 1.5vw, 0.75rem);
+            background-color: #f5f5f5;
+            border-radius: 0.5rem;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
             font-family: "Noto Sans Devanagari", sans-serif;
         }
+        /* Media Queries for Responsiveness */
         
-        #enable-notifications,
-        #install-app {
-            margin: 0.625rem auto;
-            display: block;
-            padding: 0.625rem 1.25rem;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 0.3125rem;
-            cursor: pointer;
-            min-height: 44px;
-            width: 100%;
-            max-width: 300px;
+        @media (max-width: 600px) {
+             :root[data-mode="default"] .calendar-day {
+                min-height: clamp(60px, 18vw, 70px);
+                padding: clamp(0.3rem, 1vw, 0.5rem);
+            }
+             :root[data-mode="default"] .calendar-day .ad-date,
+             :root[data-mode="default"] .calendar-day .bs-date {
+                font-size: clamp(0.6rem, 1.6vw, 0.7rem);
+            }
+             :root[data-mode="default"] .calendar-day .month-display {
+                font-size: clamp(0.55rem, 1.6vw, 0.65rem);
+            }
         }
-        /* Small screens (mobile, <= 480px) */
         
-        @media (max-width: 480px) {
-            .container {
-                padding: 0.5rem;
+        @media (min-width: 600px) {
+            .calendar-day {
+                min-height: clamp(70px, 12vw, 80px);
+            }
+            .calendar-day .ad-date,
+            .calendar-day .bs-date {
+                font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+            }
+            .calendar-day .month-display {
+                font-size: clamp(0.7rem, 2vw, 0.8rem);
             }
             .current-date {
-                flex-direction: column;
-                align-items: center;
-                gap: 0.5rem;
+                grid-template-columns: repeat(2, 1fr);
             }
-            .date-box {
-                min-width: 100%;
-                max-width: 100%;
+        }
+        
+        @media (min-width: 900px) {
+            .container {
+                width: min(85%, 1100px);
             }
-            .calendar-header {
-                flex-direction: column;
-                gap: 0.5rem;
+            .calendar-day {
+                min-height: clamp(80px, 10vw, 90px);
+            }
+            .calendar-day .ad-date,
+            .calendar-day .bs-date {
+                font-size: clamp(0.9rem, 2.5vw, 1rem);
+            }
+            .calendar-day .month-display {
+                font-size: clamp(0.8rem, 2.2vw, 0.9rem);
             }
             .calendar-header .selectors {
-                flex-direction: column;
-                width: 100%;
-                align-items: stretch;
-            }
-            .calendar-header select,
-            .calendar-header button {
-                width: 100%;
-                font-size: 0.8rem;
-                padding: 0.5rem;
-            }
-            .calendar-grid {
-                gap: 0.2rem;
-                padding: 0.4rem;
-            }
-            .calendar-day-header {
-                padding: 0.4rem;
-            }
-            .calendar-day {
-                padding: 0.2rem;
-                min-height: clamp(35px, 12vw, 50px);
-            }
-            .month-display {
-                display: none;
-                /* Hide month name on very small screens */
-            }
-            .converter-options {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            .converter-options select,
-            .converter-options input,
-            .converter-options button {
-                width: 100%;
-                font-size: 0.8rem;
-                padding: 0.5rem;
-            }
-            .nepali-inputs {
-                flex-direction: column;
-            }
-        }
-        /* Medium screens (tablets, <= 768px) */
-        
-        @media (max-width: 768px) {
-            .container {
-                max-width: 95%;
-            }
-            .current-date {
-                flex-direction: row;
-            }
-            .date-box {
-                width: 100%;
-                margin-bottom: 0.8rem;
-            }
-            .calendar-header {
-                flex-direction: column;
-                align-items: center;
-            }
-            .calendar-header .selectors {
-                flex-direction: column;
-                width: 100%;
-                align-items: stretch;
-            }
-            .calendar-header select {
-                width: 100%;
-            }
-            .calendar-header .nav-buttons {
-                justify-content: center;
-                width: 100%;
-            }
-            .month-display {
-                font-size: 0.45em;
-                /* Smaller month name on tablets */
-            }
-            .converter-options {
-                flex-direction: column;
-            }
-            .converter-options select,
-            .converter-options input,
-            .converter-options button {
-                width: 100%;
-            }
-        }
-        /* Large screens (desktops, >= 1200px) */
-        
-        @media (min-width: 1200px) {
-            .container {
-                max-width: 1100px;
-            }
-            .date-box {
-                min-width: 250px;
-                padding: 1.2rem;
-            }
-            .calendar-day {
-                min-height: 70px;
-            }
-            .calendar-day-header {
-                font-size: 1rem;
-            }
-        }
-        /* Extra small devices (<= 320px) */
-        
-        @media (max-width: 320px) {
-            .calendar-day {
-                padding: 0.1rem;
-            }
-            .calendar-day-header {
-                font-size: 0.6rem;
-                padding: 0.3rem;
-            }
-             :root:not([data-mode="bs"]) .calendar-day .ad-date {
-                font-size: 0.7rem;
-            }
-             :root:not([data-mode="bs"]) .calendar-day .bs-date {
-                font-size: 0.5rem;
-            }
-             :root[data-mode="bs"] .calendar-day .ad-date {
-                font-size: 0.5rem;
-            }
-             :root[data-mode="bs"] .calendar-day .bs-date {
-                font-size: 0.7rem;
+                flex-wrap: nowrap;
             }
         }
     </style>
@@ -505,11 +432,11 @@
         <div class="current-date">
             <div class="date-box">
                 <div class="label">English Date</div>
-                <div id="english-date" class="date-value">19 August 2025</div>
+                <div id="english-date" class="date-value"></div>
             </div>
             <div class="date-box">
                 <div class="label">Nepali Date</div>
-                <div id="nepali-date" class="date-value">२०८२ भदौ ३</div>
+                <div id="nepali-date" class="date-value"></div>
             </div>
         </div>
         <div class="calendar-container">
@@ -549,7 +476,6 @@
         </div>
     </div>
     <script>
-        // Nepali date data - days in each month from 2000 to 2090 BS
         const nepaliDateData = {
             2000: [30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31],
             2001: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
@@ -647,13 +573,20 @@
             "बैशाख", "जेठ", "असार", "श्रावण", "भदौ", "असोज",
             "कार्तिक", "मंसिर", "पुष", "माघ", "फाल्गुन", "चैत्र"
         ];
-        const nepaliDays = [
-            "आइतबार", "सोमबार", "मंगलबार", "बुधबार",
-            "बिहिबार", "शुक्रबार", "शनिबार"
+        const nepaliMonthShort = [
+            "बै", "जे", "असा", "श्रा", "भ", "अ", "का", "मं", "पु", "मा", "फा", "चै"
         ];
         const englishMonths = [
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
+        ];
+        const englishMonthShort = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
+        const nepaliDays = [
+            "आइतबार", "सोमबार", "मंगलबार", "बुधबार",
+            "बिहिबार", "शुक्रबार", "शनिबार"
         ];
         const englishDays = [
             "Sunday", "Monday", "Tuesday", "Wednesday",
@@ -849,13 +782,20 @@
         });
 
         function updateCurrentDate() {
+            // Adjust for Nepal Standard Time (+0545)
             const now = new Date();
-            const englishDateStr = formatEnglishDate(now);
+            const offsetMinutes = 5 * 60 + 45; // +0545 in minutes
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const nepalTime = new Date(utc + (offsetMinutes * 60000));
+
+            const englishDateStr = formatEnglishDate(nepalTime);
             document.getElementById('english-date').textContent = englishDateStr;
-            const nepaliDate = englishToNepali(now);
+            const nepaliDate = englishToNepali(nepalTime);
             if (nepaliDate) {
                 const nepaliDateStr = formatNepaliDate(nepaliDate.year, nepaliDate.month, nepaliDate.day);
                 document.getElementById('nepali-date').textContent = nepaliDateStr;
+            } else {
+                document.getElementById('nepali-date').textContent = 'Error calculating Nepali date';
             }
         }
 
@@ -977,12 +917,14 @@
                 calendarEl.innerHTML = '';
                 const today = new Date();
                 const todayNepali = englishToNepali(today);
+                const isSmallScreen = window.innerWidth < 600;
+
                 if (currentMode === 'ad') {
                     const firstDayDate = nepaliToEnglish(year, month, 1);
                     if (!firstDayDate) return;
                     const adYear = firstDayDate.getFullYear();
                     const adMonth = firstDayDate.getMonth();
-                    const englishMonthName = englishMonths[adMonth];
+                    const englishMonthName = isSmallScreen ? englishMonthShort[adMonth] : englishMonths[adMonth];
                     monthYearEl.innerHTML = `${englishMonthName} ${adYear} AD`;
                     const firstDay = new Date(adYear, adMonth, 1).getDay();
                     const totalDays = getEnglishMonthDays(adYear, adMonth);
@@ -1015,14 +957,15 @@
                     const firstDayDate = nepaliToEnglish(year, month, 1);
                     if (!firstDayDate) return;
                     const adYear = firstDayDate.getFullYear();
-                    const englishMonthName = englishMonths[firstDayDate.getMonth()];
+                    const englishMonthName = isSmallScreen ? englishMonthShort[firstDayDate.getMonth()] : englishMonths[firstDayDate.getMonth()];
+                    const bsMonth = isSmallScreen ? nepaliMonthShort[month - 1] : nepaliMonths[month - 1];
                     const firstDay = firstDayDate.getDay();
                     const totalDays = nepaliDateData[year][month - 1];
                     if (currentMode === 'bs') {
-                        monthYearEl.innerHTML = `${nepaliMonths[month - 1]} ${toDevanagariNumber(year)} BS`;
+                        monthYearEl.innerHTML = `${bsMonth} ${toDevanagariNumber(year)} BS`;
                     } else {
                         monthYearEl.innerHTML = `
-                            <div>${nepaliMonths[month - 1]} ${toDevanagariNumber(year)} BS</div>
+                            <div>${bsMonth} ${toDevanagariNumber(year)} BS</div>
                             <div>${englishMonthName} ${adYear} AD</div>
                         `;
                     }
@@ -1043,8 +986,7 @@
                         dayEl.className = 'calendar-day';
                         const adDate = nepaliToEnglish(year, month, day);
                         if (adDate) {
-                            const adMonth = englishMonths[adDate.getMonth()];
-                            const bsMonth = nepaliMonths[month - 1];
+                            const adMonth = isSmallScreen ? englishMonthShort[adDate.getMonth()] : englishMonths[adDate.getMonth()];
                             if (currentMode === 'bs') {
                                 dayEl.innerHTML = `
                                     <div class="bs-date">${toDevanagariNumber(day)}</div>
@@ -1054,7 +996,7 @@
                                 dayEl.innerHTML = `
                                     <div class="bs-date">${toDevanagariNumber(day)}</div>
                                     <div class="ad-date">${adDate.getDate()}</div>
-                                    <div class="month-display">${bsMonth} / ${adMonth}</div>
+                                    <div class="month-display">${bsMonth}/${adMonth}</div>
                                 `;
                             }
                             if (todayNepali && year === todayNepali.year && month === todayNepali.month && day === todayNepali.day) {
