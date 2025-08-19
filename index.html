@@ -348,7 +348,6 @@
         </header>
         <button id="enable-notifications" style="margin: 10px auto; display: block; padding: 10px 20px; background-color: var(--primary-color); color: white; border: none; border-radius: 5px; cursor: pointer;">Enable Notifications</button>
         <button id="install-app" style="margin: 10px auto; display: none; padding: 10px 20px; background-color: var(--primary-color); color: white; border: none; border-radius: 5px; cursor: pointer;">Install as Mobile App</button>
-        <button id="test-notification" style="margin: 10px auto; display: block; padding: 10px 20px; background-color: var(--secondary-color); color: white; border: none; border-radius: 5px; cursor: pointer;">Test Notification</button>
         <div class="current-date">
             <div class="date-box">
                 <div class="label">English Date</div>
@@ -516,7 +515,7 @@
             month: 1,
             day: 1
         };
-        const refDateEnglish = new Date(1943, 3, 14);
+        const refDateEnglish = new Date(1943, 3, 14); // April 14, 1943
         // Devanagari digits mapping
         const devanagariDigits = {
             '0': '०',
@@ -550,39 +549,52 @@
                 return null;
             }
             let totalDays = 0;
+            // Calculate days from 2000 BS to the year before nepYear
             for (let year = refDateNepali.year; year < nepYear; year++) {
                 if (!nepaliDateData[year]) return null;
                 totalDays += nepaliDateData[year].reduce((sum, days) => sum + days, 0);
             }
+            // Add days for months in the current year
             for (let month = 0; month < nepMonth - 1; month++) {
                 totalDays += nepaliDateData[nepYear][month];
             }
+            // Add days in the current month
             totalDays += nepDay - 1;
+            // Calculate English date
             const resultDate = new Date(refDateEnglish);
             resultDate.setDate(resultDate.getDate() + totalDays);
+            // Validate the resulting date
+            if (isNaN(resultDate.getTime())) return null;
             return resultDate;
         }
         // Convert English date to Nepali date
         function englishToNepali(engDate) {
+            if (!(engDate instanceof Date) || isNaN(engDate.getTime())) return null;
             const diffTime = engDate - refDateEnglish;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            let remainingDays = diffDays + 1;
+            if (diffDays < 0) return null; // Date before reference date
+            let remainingDays = diffDays;
             let nepYear = refDateNepali.year;
-            while (true) {
+            // Find the Nepali year
+            while (remainingDays >= 0 && nepYear <= 2090) {
                 if (!nepaliDateData[nepYear]) return null;
                 const daysInYear = nepaliDateData[nepYear].reduce((sum, days) => sum + days, 0);
-                if (remainingDays <= daysInYear) break;
+                if (remainingDays < daysInYear) break;
                 remainingDays -= daysInYear;
                 nepYear++;
             }
+            if (nepYear > 2090 || remainingDays < 0) return null;
+            // Find the Nepali month
             let nepMonth = 0;
-            while (nepMonth < 12) {
+            while (nepMonth < 12 && remainingDays >= 0) {
                 const daysInMonth = nepaliDateData[nepYear][nepMonth];
-                if (remainingDays <= daysInMonth) break;
+                if (remainingDays < daysInMonth) break;
                 remainingDays -= daysInMonth;
                 nepMonth++;
             }
-            const nepDay = remainingDays;
+            if (remainingDays < 0) return null;
+            const nepDay = remainingDays + 1; // Adjust for 1-based day
+            if (nepMonth >= 12 || nepDay > nepaliDateData[nepYear][nepMonth]) return null;
             return {
                 year: nepYear,
                 month: nepMonth + 1,
@@ -607,8 +619,11 @@
         // Get corresponding English month for a Nepali month
         function getEnglishMonthForNepali(year, month) {
             const nepaliFirstDay = nepaliToEnglish(year, month, 1);
-            if (nepaliFirstDay) return englishMonths[nepaliFirstDay.getMonth()];
-            return '';
+            if (nepaliFirstDay) return {
+                month: nepaliFirstDay.getMonth(),
+                year: nepaliFirstDay.getFullYear()
+            };
+            return null;
         }
         // Format AD date for calendar grid
         function formatADDateForGrid(date) {
@@ -689,20 +704,6 @@
                     .catch(err => console.error('Service Worker registration failed:', err));
             }
             document.getElementById('enable-notifications').addEventListener('click', requestNotificationPermission);
-            document.getElementById('test-notification').addEventListener('click', async() => {
-                try {
-                    const response = await fetch('/send-notification', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    const result = await response.json();
-                    console.log('Notification trigger response:', result);
-                } catch (error) {
-                    console.error('Error triggering notification:', error);
-                }
-            });
         });
 
         function updateCurrentDate() {
@@ -753,22 +754,58 @@
             calendarMonth.value = currentNepaliDate.month;
             renderCalendar(currentNepaliDate.year, currentNepaliDate.month);
             prevMonthBtn.addEventListener('click', function() {
-                if (currentNepaliDate.month === 1) {
-                    currentNepaliDate.year--;
-                    currentNepaliDate.month = 12;
+                if (currentMode === 'ad') {
+                    const firstDayDate = nepaliToEnglish(currentNepaliDate.year, currentNepaliDate.month, 1);
+                    if (!firstDayDate) return;
+                    const adMonth = firstDayDate.getMonth();
+                    const adYear = firstDayDate.getFullYear();
+                    if (adMonth === 0) {
+                        firstDayDate.setFullYear(adYear - 1);
+                        firstDayDate.setMonth(11);
+                    } else {
+                        firstDayDate.setMonth(adMonth - 1);
+                    }
+                    const newNepaliDate = englishToNepali(firstDayDate);
+                    if (newNepaliDate) {
+                        currentNepaliDate.year = newNepaliDate.year;
+                        currentNepaliDate.month = newNepaliDate.month;
+                    }
                 } else {
-                    currentNepaliDate.month--;
+                    if (currentNepaliDate.month === 1) {
+                        currentNepaliDate.year--;
+                        currentNepaliDate.month = 12;
+                    } else {
+                        currentNepaliDate.month--;
+                    }
                 }
                 calendarYear.value = currentNepaliDate.year;
                 calendarMonth.value = currentNepaliDate.month;
                 renderCalendar(currentNepaliDate.year, currentNepaliDate.month);
             });
             nextMonthBtn.addEventListener('click', function() {
-                if (currentNepaliDate.month === 12) {
-                    currentNepaliDate.year++;
-                    currentNepaliDate.month = 1;
+                if (currentMode === 'ad') {
+                    const firstDayDate = nepaliToEnglish(currentNepaliDate.year, currentNepaliDate.month, 1);
+                    if (!firstDayDate) return;
+                    const adMonth = firstDayDate.getMonth();
+                    const adYear = firstDayDate.getFullYear();
+                    if (adMonth === 11) {
+                        firstDayDate.setFullYear(adYear + 1);
+                        firstDayDate.setMonth(0);
+                    } else {
+                        firstDayDate.setMonth(adMonth + 1);
+                    }
+                    const newNepaliDate = englishToNepali(firstDayDate);
+                    if (newNepaliDate) {
+                        currentNepaliDate.year = newNepaliDate.year;
+                        currentNepaliDate.month = newNepaliDate.month;
+                    }
                 } else {
-                    currentNepaliDate.month++;
+                    if (currentNepaliDate.month === 12) {
+                        currentNepaliDate.year++;
+                        currentNepaliDate.month = 1;
+                    } else {
+                        currentNepaliDate.month++;
+                    }
                 }
                 calendarYear.value = currentNepaliDate.year;
                 calendarMonth.value = currentNepaliDate.month;
@@ -802,48 +839,99 @@
 
             function renderCalendar(year, month) {
                 calendarEl.innerHTML = '';
-                const firstDayDate = nepaliToEnglish(year, month, 1);
-                if (!firstDayDate) return;
-                const adYear = firstDayDate.getFullYear();
-                const englishMonthName = englishMonths[firstDayDate.getMonth()];
-                const firstDay = firstDayDate.getDay();
-                const totalDays = nepaliDateData[year][month - 1];
                 const today = new Date();
                 const todayNepali = englishToNepali(today);
-                monthYearEl.innerHTML = `
-                    <div class="bs-line">${nepaliMonths[month - 1]} ${toDevanagariNumber(year)} BS</div>
-                    <div class="ad-line">${englishMonthName} ${adYear} AD</div>
-                `;
-                const dayHeaders = currentMode === 'ad' ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['आइत', 'सोम', 'मंगल', 'बुध', 'बिहि', 'शुक्र', 'शनि'];
-                dayHeaders.forEach(day => {
-                    const dayEl = document.createElement('div');
-                    dayEl.className = 'calendar-day-header';
-                    dayEl.textContent = day;
-                    calendarEl.appendChild(dayEl);
-                });
-                for (let i = 0; i < firstDay; i++) {
-                    const emptyEl = document.createElement('div');
-                    emptyEl.className = 'calendar-day empty';
-                    calendarEl.appendChild(emptyEl);
-                }
-                for (let day = 1; day <= totalDays; day++) {
-                    const dayEl = document.createElement('div');
-                    dayEl.className = 'calendar-day';
-                    const adDate = nepaliToEnglish(year, month, day);
-                    if (currentMode === 'ad') {
-                        dayEl.innerHTML = `<div class="ad-date">${adDate ? adDate.getDate() : ''}</div>`;
-                    } else if (currentMode === 'bs') {
-                        dayEl.innerHTML = `<div class="bs-date">${toDevanagariNumber(day)}</div>`;
-                    } else {
+                if (currentMode === 'ad') {
+                    const firstDayDate = nepaliToEnglish(year, month, 1);
+                    if (!firstDayDate) return;
+                    const adYear = firstDayDate.getFullYear();
+                    const adMonth = firstDayDate.getMonth();
+                    const englishMonthName = englishMonths[adMonth];
+                    monthYearEl.innerHTML = `${englishMonthName} ${adYear} AD`;
+                    const firstDay = new Date(adYear, adMonth, 1).getDay();
+                    const totalDays = getEnglishMonthDays(adYear, adMonth);
+                    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    dayHeaders.forEach(day => {
+                        const dayEl = document.createElement('div');
+                        dayEl.className = 'calendar-day-header';
+                        dayEl.textContent = day;
+                        calendarEl.appendChild(dayEl);
+                    });
+                    for (let i = 0; i < firstDay; i++) {
+                        const emptyEl = document.createElement('div');
+                        emptyEl.className = 'calendar-day empty';
+                        calendarEl.appendChild(emptyEl);
+                    }
+                    for (let day = 1; day <= totalDays; day++) {
+                        const dayEl = document.createElement('div');
+                        dayEl.className = 'calendar-day';
+                        const adDate = new Date(adYear, adMonth, day);
+                        const dateDisplay = `${adDate.getDate()} ${englishMonthName}`;
                         dayEl.innerHTML = `
-                            <div class="bs-date">${toDevanagariNumber(day)}</div>
-                            <div class="ad-date">${adDate ? adDate.getDate() : ''}</div>
+                            <div class="ad-date">${adDate.getDate()}</div>
+                            <div class="month-display">${englishMonthName}</div>
+                        `;
+                        if (adDate.toDateString() === today.toDateString()) {
+                            dayEl.classList.add('today');
+                        }
+                        calendarEl.appendChild(dayEl);
+                    }
+                } else {
+                    const firstDayDate = nepaliToEnglish(year, month, 1);
+                    if (!firstDayDate) return;
+                    const adYear = firstDayDate.getFullYear();
+                    const englishMonthName = englishMonths[firstDayDate.getMonth()];
+                    const firstDay = firstDayDate.getDay();
+                    const totalDays = nepaliDateData[year][month - 1];
+                    if (currentMode === 'bs') {
+                        monthYearEl.innerHTML = `${nepaliMonths[month - 1]} ${toDevanagariNumber(year)} BS`;
+                    } else {
+                        monthYearEl.innerHTML = `
+                            <div class="bs-line">${nepaliMonths[month - 1]} ${toDevanagariNumber(year)} BS</div>
+                            <div class="ad-line">${englishMonthName} ${adYear} AD</div>
                         `;
                     }
-                    if (todayNepali && year === todayNepali.year && month === todayNepali.month && day === todayNepali.day) {
-                        dayEl.classList.add('today');
+                    const dayHeaders = currentMode === 'ad' ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['आइत', 'सोम', 'मंगल', 'बुध', 'बिहि', 'शुक्र', 'शनि'];
+                    dayHeaders.forEach(day => {
+                        const dayEl = document.createElement('div');
+                        dayEl.className = 'calendar-day-header';
+                        dayEl.textContent = day;
+                        calendarEl.appendChild(dayEl);
+                    });
+                    for (let i = 0; i < firstDay; i++) {
+                        const emptyEl = document.createElement('div');
+                        emptyEl.className = 'calendar-day empty';
+                        calendarEl.appendChild(emptyEl);
                     }
-                    calendarEl.appendChild(dayEl);
+                    for (let day = 1; day <= totalDays; day++) {
+                        const dayEl = document.createElement('div');
+                        dayEl.className = 'calendar-day';
+                        const adDate = nepaliToEnglish(year, month, day);
+                        let dateDisplay = '';
+                        if (adDate) {
+                            const nepaliDate = englishToNepali(adDate);
+                            const adMonth = englishMonths[adDate.getMonth()];
+                            const bsMonth = nepaliMonths[month - 1];
+                            if (currentMode === 'bs') {
+                                dateDisplay = `${toDevanagariNumber(day)} ${bsMonth}`;
+                                dayEl.innerHTML = `
+                                    <div class="bs-date">${toDevanagariNumber(day)}</div>
+                                    <div class="month-display">${bsMonth}</div>
+                                `;
+                            } else {
+                                dateDisplay = `${toDevanagariNumber(day)} ${bsMonth} / ${adDate.getDate()} ${adMonth}`;
+                                dayEl.innerHTML = `
+                                    <div class="bs-date">${toDevanagariNumber(day)}</div>
+                                    <div class="ad-date">${adDate ? adDate.getDate() : ''}</div>
+                                    <div class="month-display">${dateDisplay}</div>
+                                `;
+                            }
+                            if (todayNepali && year === todayNepali.year && month === todayNepali.month && day === todayNepali.day) {
+                                dayEl.classList.add('today');
+                            }
+                        }
+                        calendarEl.appendChild(dayEl);
+                    }
                 }
             }
         }
